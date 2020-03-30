@@ -26,6 +26,7 @@ func (a *App) Initialize(user, password, dbname string) {
 	}
 
 	a.Router = mux.NewRouter()
+	a.InitializeRoutes()
 }
 
 func (a *App) InitializeRoutes() {
@@ -36,7 +37,9 @@ func (a *App) InitializeRoutes() {
 	a.Router.HandleFunc("/product/{id:[0-9]+}", a.deleteProduct).Methods("DELETE")
 }
 
-func (a *App) Run(addr string) {}
+func (a *App) Run(addr string) {
+	log.Fatal(http.ListenAndServe("8010", a.Router))
+}
 
 func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -106,7 +109,7 @@ func (a *App) updateProduct(w http.ResponseWriter, r *http.Request) {
 	var p Product
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&p); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
 		return
 	}
 	defer r.Body.Close()

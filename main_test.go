@@ -99,6 +99,7 @@ func TestGetProduct(t *testing.T) {
 func TestUpdateProduct(t *testing.T) {
 	clearTable()
 	addProducts(1)
+
 	req, _ := http.NewRequest("GET", "/product/1", nil)
 	response := executeRequest(req)
 	var originalProduct map[string] interface {}
@@ -113,6 +114,8 @@ func TestUpdateProduct(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 
 	var m map[string] interface {}
+	json.Unmarshal(response.Body.Bytes(), &m)
+
 	if m["id"] != originalProduct["id"] {
 		t.Errorf("Expected the id to remain the same (%v). Got %v", originalProduct["id"], m["id"])
 	}
