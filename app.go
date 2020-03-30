@@ -10,7 +10,7 @@ import (
 
 type App struct {
 	Router *mux.Router
-	DB *sql.DB
+	DB     *sql.DB
 }
 
 func (a *App) Initialize(user, password, dbname string) {
