@@ -11,11 +11,13 @@ import (
 	"strconv"
 )
 
+// App struct exposes references to the router and the database that the application uses.
 type App struct {
 	Router *mux.Router
 	DB     *sql.DB
 }
 
+// Initialize function takes in the details required to connect to the database.
 func (a *App) Initialize(user, password, dbname string) {
 	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", user, password, dbname)
 
@@ -29,6 +31,7 @@ func (a *App) Initialize(user, password, dbname string) {
 	a.InitializeRoutes()
 }
 
+// InitializeRoutes function links the url path to the functions on a http verb.
 func (a *App) InitializeRoutes() {
 	a.Router.HandleFunc("/products", a.getProducts).Methods("GET")
 	a.Router.HandleFunc("/product", a.createProduct).Methods("POST")
@@ -37,10 +40,12 @@ func (a *App) InitializeRoutes() {
 	a.Router.HandleFunc("/product/{id:[0-9]+}", a.deleteProduct).Methods("DELETE")
 }
 
+// Run method will simply start the application.
 func (a *App) Run(addr string) {
 	log.Fatal(http.ListenAndServe("8010", a.Router))
 }
 
+// getProduct function fetches a single product from the database.
 func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -63,6 +68,7 @@ func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, p)
 }
 
+// getProducts function fetches a list of products from the database.
 func (a *App) getProducts(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
@@ -82,6 +88,7 @@ func (a *App) getProducts(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, products)
 }
 
+// createProduct function inserts a new product in the database.
 func (a *App) createProduct(w http.ResponseWriter, r *http.Request) {
 	var p Product
 	decoder := json.NewDecoder(r.Body)
@@ -98,6 +105,7 @@ func (a *App) createProduct(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusCreated, p)
 }
 
+// updateProduct function updates data about a registered product.
 func (a *App) updateProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -123,6 +131,7 @@ func (a *App) updateProduct(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, p)
 }
 
+// deleteProduct function removes a registered product from the database.
 func (a *App) deleteProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])

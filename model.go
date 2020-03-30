@@ -4,6 +4,7 @@ import (
 	"database/sql"
 )
 
+// Product struct has the attributes of a product.
 type Product struct {
 	ID    int     `json:"id"`
 	Name  string  `json:"name"`
